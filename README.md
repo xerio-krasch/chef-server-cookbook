@@ -35,6 +35,7 @@ The recipes in the chef cookbook that are now in chef-server:
 
     chef::bootstrap_server -> chef-server::rubygems-install
     chef::server -> chef-server::default
+    chef::server_proxy -> chef-server::apache-proxy
 
 See the recipes section below.
 
@@ -61,6 +62,7 @@ Cookbooks
 The chef-server cookbook requires the following cookbooks from Opscode. Some are required for various init style options (bluepill, runit, daemontools):
 
 * apt
+* apache2
 * runit
 * couchdb
 * chef-client
@@ -173,6 +175,11 @@ Set the name of the special client used to validate new clients. Default `chef-v
 
 Number of nodes to start up for the chef-expander (replacement for chef-solr-indexer in 0.10). Default is 1.
 
+Server Proxy Attributes
+-----------------------
+
+The following attributes are used by the `apache-proxy.rb` recipe, and are stored in the `apache-proxy.rb` attributes file. They are under the `node['chef_server']` attribute space.
+
 doc\_root
 ---------
 
@@ -213,6 +220,12 @@ default
 
 Since the Chef Server itself typically runs the CouchDB service for the data store, the recipe will do a compaction on the Chef database and all the views associated with the Chef Server. These compactions only occur if the database/view size is more than 100Mb. It will use the configured CouchDB URL, which is `http://localhost:5984` by default. The actual value used for the CouchDB server is from the `Chef::Config[:couchdb_url]`, so this can be dynamically changed in the /etc/chef/server.rb config file.
 
+apache-proxy
+------------
+
+This recipe sets up an Apache2 VirtualHost to proxy HTTPS for the Chef Server API and WebUI.
+
+The API will be proxied on port 443. If the WebUI is enabled, it will be proxied on port 444. The recipe dynamically creates the OpenSSL certificate based on the `node['chef_server']['ssl_req']` attribute. It uses additional configuration for Apache to improve performance of the webui. The virtual host template is `chef_server.conf.erb`. The DocumentRoot setting is used for the WebUI, but not the API, and is set with the attribute `node['chef_server']['doc_root']`.
 
 rubygems-install
 ----------------
@@ -254,6 +267,11 @@ For more information see [Bootstrap Chef RubyGems Installation](http://wiki.opsc
 
 TEMPLATES
 =========
+
+chef\_server.conf.erb
+---------------------
+
+VirtualHost file used by Apache2 in the `chef-server::apache-proxy` recipe.
 
 server.rb.erb
 -------------
