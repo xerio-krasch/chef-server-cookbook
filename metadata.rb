@@ -6,6 +6,7 @@ long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version           "0.99.11"
 recipe            "chef-server", "Compacts the Chef Server CouchDB."
 recipe            "chef-server::rubygems-install", "Set up rubygem installed chef server."
+recipe            "chef-server::apache-proxy", "Configures Apache2 proxy for API and WebUI"
 recipe            "chef-server::nginx-proxy", "Configures NGINX proxy for API and WebUI"
 
 %w{ ubuntu debian redhat centos fedora freebsd openbsd }.each do |os|
